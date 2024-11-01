@@ -1,0 +1,153 @@
+---
+title: "Analyse en composantes principales appliquée à l'étude du marché de l'emploi en 1979 dans 26 pays europééen"
+author: "Kim Duncan ISHIMWE, Diarra Leye, Bénitha Liesse MANIRAKIZA, Oumy Beye"
+date: "2023-10-26"
+output:
+  html_document:
+    toc: yes
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Chargement des données
+```{r}
+emploi = read.csv("http://www.math.univ-toulouse.fr/~ferraty/DATA/eurojob79.csv", header= TRUE, row.names =1, sep = ",",dec=".", stringsAsFactors = T)
+
+```
+
+## Visualisation des données
+```{r}
+library(knitr)
+kable(emploi)
+```
+
+## Affichage d'un résumé des données
+```{r}
+summary(emploi)
+```
+
+## Chargement de la librairie
+```{r}
+library(FactoMineR)
+```
+
+## ACP sans graphes 
+```{r}
+res.emploi = PCA(emploi, graph = F)
+
+```
+
+## Résumé des données en ACP
+```{r}
+summary(res.emploi)
+```
+
+Ce sont les axes 1 et 2 qui retiennent le plus d'informations avec respectivement 38.746% et 23.669% de l'information. Quant aux autres axes, ils présentent une quantité d'informations moins importante.
+De ce fait, ce sont les axes 1 et 2 qui seront retenus dans l'analyse APC de notre jeu de données.
+
+
+## Représentation des individus
+```{r}
+plot(res.emploi, choix = 'ind', cex = 1.5)
+```
+
+
+## Cercle des corrélations
+```{r}
+plot(res.emploi, choix ='var', cex = 1.5)
+```
+
+On peut noter que pour cette analyse en composantes principales  on n'aura pas de variables (qualitatives ou quantitatives) supplémentaires.
+
+En analysant le graphe ACP des variables, on peut déjà s'apercevoir que les secteurs d'activité les mieux représentés (les plus proches des bords du cercle) sont Mines, Services industriels, Production, Agriculture.
+
+Pour les individus, on peut observer quelques individus extrêmes comme la Turquie qui, en analysant le graphe des individus, semble être à l'écart des autres pays tout comme la Hongrie un peu plus en haut que les autres individus dans le repère.
+
+### Les contributions des variables dans la construction des axes
+```{r}
+sort(res.emploi$var$contrib[ , 'Dim.1'])
+
+
+```
+
+La variable Mines est celle qui contribue le moins à la construction de l'axe 1 et c'est la variable Agriculture sui contribue le plus à la construction de l'axe 1.
+
+```{r}
+sort(res.emploi$var$contrib[ , 'Dim.2'])
+```
+
+Quant à l'axe 2, c'est la variable Construction qui contribue le moins à la construction de l'axe tandisque la variable Mines est celle qui contribue le plus à la construction de l'axe.
+
+### Degré de représentation des variables sur les axes
+```{r}
+sort(res.emploi$var$cos2[, 'Dim.1'])
+```
+C'est la variable Mines qui a la plus faible représentation (quasiment nulle) sur l'axe 1 et c'est la variable Agriculture qui a la meilleure représentation sur l'axe avec une valeur cos2 qui est égale à 0.95.
+```{r}
+sort(res.emploi$var$cos2[, 'Dim.2'])
+
+```
+C'est la variable Construction qui a la plus faible représentation (0.005) sur l'axe 1 et c'est la variable Agriculture qui a la meilleure représentation sur l'axe avec une valeur cos2 qui est égale à 0.81.
+
+### Corrélation (coordonnées) des variables avec les axes
+```{r}
+sort(res.emploi$var$coord[,'Dim.1'])
+ 
+```
+
+Sur l'axe 1, la variable Agriculture se démarque des autres car elle est fortement corrélée négativement c'est à dire que plus la cordonnée d'un pays sur l'axe 1 diminuera (sera de plus en plus à gauche) plus la part de l'agriculture dans  son marché du travail sera importante.C'est notamment le cas de la Turquie. 
+
+On a aussi la variable qui représente les services sociaux qui a une cordonnée assez positive sur l'axe 1. Plus un pays aura une cordonnée assez importante (de plus en plus à droite) plus les services sociaux occuperont une part importante dans son marche de l'emploi. On peut dans ce cas citer des pays comme la Belgique, la Norvège, le Royaume Uni, l'Allemagne de l'Est.
+```{r}
+sort(res.emploi$var$coord[,'Dim.2'])
+```
+
+Sur l'axe 2, la variable des finances est celle qui est corrélée de manière "négative" :plus un pays aura une cordonnée moindre basse sur l'axe 2 (de plus en plus en bas) plus le secteur des finances aura une part importante dans ses activités. C'est le cas des pays comme la France, les Pays-Bas et la Suède.
+
+On a également la variable Mines qui est très fortement corrélée "positivement" sur l'axe 2 avec une coordonnée un peu plus supérireure à 0.9. On peut donc en déduire que plus un pays aura une cordonnée assez importante sur l'axe 2 (de plus en plus en haut) plus ce pays aura une part importante des Mines parmi ses activités. C'est le cas des pays comme la Hongrie et la République tchèque.
+
+
+## Décroissance des inerties
+```{r}
+barplot(res.emploi$eig[,2], main = "Décroissance des inerties (%)", names.arg = 1:nrow(res.emploi$eig))
+```
+
+Comme prédécemment mentionné, ce sont effectivement les deux premiers axes qui occupent une inertie significative.
+
+## Qualité de représentation des individus 
+
+### Sur l'axe 1
+```{r}
+sort(res.emploi$ind$cos2[,"Dim.1"])
+```
+
+L'individu qui correspond à l'URSS est celui qui a la représentation la plus faible sur l'axe 1 et c'est l'individu qui correspond  la Turquie qui est le mieux représenté sur l'axe 1.
+### sur l'axe 2
+```{r}
+sort(res.emploi$ind$cos2[,"Dim.2"])
+```
+
+L'individu qui correspond à l'Allemagne de l'ouest est celui qui a la représentation la plus faible sur l'axe 2 et c'est l'individu qui correspond  la République tchèque qui est le mieux représenté sur l'axe 2.
+## Contribution des individus sur l'axe 1 
+
+### Sur l'axe 1
+```{r}
+sort(res.emploi$ind$contrib[,1])
+```
+
+L'individu qui correspond à l'URSS est celui qui contribue le moins à la construction de l'axe 1 tandisque celui qui correspond à la Turquie contribue fortement à la construction de l'axe 1.
+### Sur l'axe 2
+```{r}
+sort(res.emploi$ind$contrib[,2])
+```
+
+Quant à l'axe 2, l'individu qui correspond à l'Allemagne de l'Ouest est celui qui contribue le moins à la construction de l'axe 2.
+L'individu qui correspond  à la Hongrie est celui qui contribue à la construction de l'axe 2.
+
+
